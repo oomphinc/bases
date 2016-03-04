@@ -1,0 +1,23 @@
+{
+	"name": "oomphinc/bases",
+	"description": "WordPress base classes that help expedite theme and plugin development",
+	"homepage": "http://www.oomphinc.com/",
+	"version": "1.0",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Ben Doherty",
+			"homepage": "https://github.com/bendoh"
+		},
+		{
+			"name": "Stephen Beemsterboer",
+			"homepage": "https://github.com/balbuf"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/oomphinc/bases/issues"
+	},
+	"autoload": {
+		"psr-4": {"OomphInc\\Bases\\": "src/"}
+	}
+}
