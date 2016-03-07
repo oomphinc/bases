@@ -6,12 +6,10 @@
 
 namespace OomphInc\Bases\Post;
 
-abstract class CustomPostType {
+use OomphInc\Bases\BaseEntity;
 
-	// Instances of derivative classes
-	private static $instance = [];
-	// The post type slug
-	const post_type = '';
+abstract class CustomPostType extends BaseEntity {
+
 	// Any additional arguments to register_post_type
 	protected $post_type_args = [];
 	// Taxonomies that this post type can be assigned terms from
@@ -19,50 +17,17 @@ abstract class CustomPostType {
 	// Leaving $label_singular empty implies the CPT is registered by other means
 	protected $label_singular;
 	protected $label_plural;
+	protected static $shared_hooks = [
+		[ 'init', 'register_cpt', 1 ],
+		[ 'save_post' ],
+	];
 
 	/**
-	 * Get a single canonical instance of a derivative class.
-	 * @return CustomPostType the instantiated class
-	 */
-	final static function instance() {
-		$class = get_called_class();
-
-		if( !isset( self::$instances[ $class ] ) ) {
-			self::$instances[ $class ] = new $class();
-		}
-
-		return self::$instances[ $class ];
-	}
-
-	/**
-	 * Return all of the CPT instances
-	 */
-	final static function get_types() {
-		return self::$instances;
-	}
-
-	private function __clone() {}
-
-	/**
-	 * Register hooks
+	 * Register hooks n' stuff
 	 */
 	protected function __construct() {
-		add_action( 'init', [ $this, 'register_cpt' ], 0 );
-		add_action( 'save_post', [ $this, 'save_post' ] );
-		add_action( 'add_meta_boxes_' . $this->get_post_type(), [ $this, 'register_meta_boxes' ] );
-
-		// initialize the the traits
-		foreach ( class_uses( $this ) as $trait ) {
-			// break up trait into namespace parts
-			$trait = explode( '\\', $trait );
-			// get the init method name
-			$init = '_init_' . end( $trait );
-			if ( is_callable( [ $this, $init ] ) ) {
-				$this->$init();
-			}
-		}
-
-		$this->init();
+		self::$shared_hooks[] = [ 'add_meta_boxes_' . $this->get_post_type(), 'register_meta_boxes' ];
+		parent::__construct();
 	}
 
 	/**
@@ -71,7 +36,7 @@ abstract class CustomPostType {
 	 * @return string The post type slug, found in the 'post_type' class constant.
 	 */
 	function get_post_type() {
-		return static::post_type;
+		return $this->get_name();
 	}
 
 	/**
@@ -112,7 +77,6 @@ abstract class CustomPostType {
 			],
 			'hierarchical' => false,
 			'rewrite' => [ 'slug' => $this->get_post_type(), 'with_front' => false, 'feeds' => true ],
-			'capability_type' => $this->get_post_type(),
 			'taxonomies' => [],
 		] );
 
@@ -125,11 +89,6 @@ abstract class CustomPostType {
 			register_taxonomy_for_object_type( $taxonomy, $this->get_post_type() );
 		}
 	}
-
-	/**
-	 * A place for the derivative class to implement additional hooks.
-	 */
-	function init() {}
 
 	/**
 	 * Register taxonomies.
@@ -147,36 +106,5 @@ abstract class CustomPostType {
 
 
 	function save_post() {}
-
-	/**
-	 * Return the nonce key that corresponds to this post type.
-	 */
-	function nonce_key() {
-		return $this->get_post_type() . '_nonce';
-	}
-
-	/**
-	 * Add a nonce field.
-	 */
-	function nonce_field() {
-		global $post;
-		if ( $post->post_type == $this->get_post_type() ) {
-			wp_nonce_field( $this->nonce_key(), $this->nonce_key(), false, true );
-		}
-	}
-
-	/**
-	 * Verify that the nonce is present and valid.
-	 * @param  boolean $once unset the nonce field so it only gets checked once?
-	 * @return boolean       validity
-	 */
-	function verify_nonce( $once = false ) {
-		$check = isset( $_POST[ $this->nonce_key() ] ) && wp_verify_nonce( $_POST[ $this->nonce_key() ], $this->nonce_key() );
-		// do we only want to do this once?
-		if ( $once ) {
-			unset( $_POST[ $this->nonce_key() ] );
-		}
-		return $check;
-	}
 
 }

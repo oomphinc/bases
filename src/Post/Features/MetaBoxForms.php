@@ -11,6 +11,8 @@ namespace OomphInc\Bases\Post\Features;
  */
 trait MetaBoxForms {
 
+	use \OomphInc\Bases\Common\Nonce;
+
 	protected function _init_MetaBoxForms() {
 		if ( !empty( $this->meta_forms ) ) {
 			add_action( 'add_meta_boxes_' . $this->get_post_type(), [ $this, '_register_meta_boxes' ] );
@@ -24,13 +26,13 @@ trait MetaBoxForms {
 	 * @action add_meta_boxes_[post_type]
 	 */
 	function _register_meta_boxes( $post ) {
-		add_action( 'post_submitbox_misc_actions', [ $this, 'add_nonce' ] );
-		add_action( 'attachment_submitbox_misc_actions', [ $this, 'add_nonce' ] );
+		add_action( 'post_submitbox_misc_actions', [ $this, '_add_nonce' ] );
+		add_action( 'attachment_submitbox_misc_actions', [ $this, '_add_nonce' ] );
 
 		$this->prepare_meta_form();
 
 		// each element in $this->meta_forms gets its own meta box
-		foreach ( WP_Forms_API::get_elements( $this->meta_forms ) as $key => $form ) {
+		foreach ( \WP_Forms_API::get_elements( $this->meta_forms ) as $key => $form ) {
 			$form += [ '#context' => 'normal', '#priority' => 'default' ];
 
 			add_meta_box( $this->get_post_type() . '-' . $key, $form['#label'], [ $this, '_meta_boxes' ], $this->get_post_type(), $form['#context'], $form['#priority'], $form );
@@ -38,6 +40,16 @@ trait MetaBoxForms {
 
 		// Allow subclasses to register additional meta box
 		$this->register_meta_boxes( $post );
+	}
+
+	/**
+	 * Add the nonce field on post pages that use meta box forms.
+	 */
+	function _add_nonce() {
+		global $post;
+		if ( $post->post_type === $this->get_post_type() ) {
+			$this->nonce_field();
+		}
 	}
 
 	/**
@@ -68,7 +80,7 @@ trait MetaBoxForms {
 
 		// munge the meta form
 		$this->prepare_meta_form();
-		WP_Forms_API::process_form( $this->meta_forms, $meta_values );
+		\WP_Forms_API::process_form( $this->meta_forms, $meta_values );
 
 		if ( isset( $meta_values ) ) {
 			$this->replace_post_meta( $post->ID, $meta_values );
@@ -95,7 +107,7 @@ trait MetaBoxForms {
 			$values[ $meta_key ] = maybe_unserialize( $meta_values[0] );
 		}
 
-		echo WP_Forms_API::render_form( $form, $values );
+		echo \WP_Forms_API::render_form( $form, $values );
 	}
 
 	/**
