@@ -7,8 +7,6 @@
 
 namespace OomphInc\Bases\Post\Features;
 
-use OomphInc\Bases\Admin\SettingsPage as Page;
-
 // prefix for options
 const OPTIONS_PREFIX = 'CPT_settings_';
 
@@ -21,7 +19,7 @@ trait SettingsPage {
 
 	protected function _init_SettingsPage() {
 		if ( !empty( $this->settings_form ) ) {
-			$this->_page = new Page( OPTIONS_PREFIX . $this->get_post_type(), [
+			$this->_page = new \OomphInc\Bases\Admin\SettingsPage( OPTIONS_PREFIX . $this->get_post_type(), [
 				'parent' => 'edit.php?post_type=' . $this->get_post_type(),
 				'form' => $this->settings_form,
 			] );
