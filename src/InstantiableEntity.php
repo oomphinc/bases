@@ -8,6 +8,8 @@ namespace OomphInc\Bases;
 
 class InstantiableEntity extends BaseEntity {
 
+	protected $name;
+
 	function __construct( $name = null, array $properties = [] ) {
 		if ( isset( $name ) ) {
 			$this->name = $name;
