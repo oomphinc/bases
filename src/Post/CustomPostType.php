@@ -19,6 +19,7 @@ abstract class CustomPostType extends BaseEntity {
 	protected $label_plural;
 	protected static $shared_hooks = [
 		[ 'init', 'register_cpt', 1 ],
+		[ 'init', 'handle_taxonomies', 2 ],
 		[ 'save_post' ],
 	];
 
@@ -81,7 +82,12 @@ abstract class CustomPostType extends BaseEntity {
 		] );
 
 		register_post_type( $this->get_post_type(), $args );
+	}
 
+	/**
+	 * Run any taxonomy creation and link up taxonomies.
+	 */
+	function handle_taxonomies() {
 		$this->register_taxonomies();
 
 		// Assign applicable taxonomies
@@ -105,6 +111,6 @@ abstract class CustomPostType extends BaseEntity {
 	function register_meta_boxes() {}
 
 
-	function save_post() {}
+	function save_post( $post_id, $post, $update ) {}
 
 }
