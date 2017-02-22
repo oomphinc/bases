@@ -20,7 +20,7 @@ trait SettingsPage {
 	protected function _init_SettingsPage() {
 		if ( !empty( $this->settings_form ) ) {
 			$this->_page = new \OomphInc\Bases\Admin\SettingsPage( OPTIONS_PREFIX . $this->get_post_type(), [
-				'parent' => 'edit.php?post_type=' . $this->get_post_type(),
+				'parent' => 'edit.php' . ( $this->get_post_type() !== 'post' ? '?post_type=' . $this->get_post_type() : '' ),
 				'form' => $this->settings_form,
 			] );
 		}
