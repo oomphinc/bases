@@ -12,12 +12,13 @@ abstract class Widget extends \WP_Widget {
 
 	protected $form = [];
 	protected $widget_name = '';
+	protected $options = [];
 
 	public function __construct() {
 		$this->pre_init();
 		// follow ID base pattern used in core but without slashes
 		$id_base = str_replace( '\\', '-', strtolower( get_class( $this ) ) );
-		parent::__construct( $id_base, $this->widget_name );
+		parent::__construct( $id_base, $this->widget_name, $this->options );
 		$this->init();
 	}
 
