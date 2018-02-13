@@ -4,4 +4,4 @@
 
 ## Deprecation Notice!
 
-`oomphinc/bases` has been **deprecated**. We recommend using [`oomphinc/wasp`](https://github.com/oomphinc/wasp) instead.
+`oomphinc/bases` has been **deprecated** and will no longer be actively developed. We recommend using [`oomphinc/wasp`](https://github.com/oomphinc/wasp) instead.
